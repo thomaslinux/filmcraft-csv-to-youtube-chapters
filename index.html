@@ -22,6 +22,7 @@
 
   <button id="convert" class="btn">Convert to YouTube chapters</button>
   <button id="copy" type="button" class="btn">Copy output</button>
+  <button id="download" type="button" class="btn">Download chapters.txt</button>
   <span id="status" role="status"></span>
 
   <label for="output">YouTube chapters:</label>
@@ -35,6 +36,20 @@
 	<a href="index.html" download class="btn" style="text-decoration:none">
 		Save page for offline use
 	</a>
+<script class="download-chapters">
+	document.getElementById('download').addEventListener('click', () => {
+	  const text = document.getElementById('output').value;
+	  const blob = new Blob([text], { type: 'text/plain' });
+	  const url = URL.createObjectURL(blob);
+	  
+	  const a = document.createElement('a');
+	  a.href = url;
+	  a.download = 'chapters.txt';
+	  a.click();
+	  
+	  URL.revokeObjectURL(url);
+	});
+</script>
   <script>
     const input = document.getElementById("input");
     const output = document.getElementById("output");
