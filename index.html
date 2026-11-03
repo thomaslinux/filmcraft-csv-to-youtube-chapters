@@ -8,37 +8,33 @@
 </head>
 <body>
   <h1>FilmCraft csv markers to YouTube Chapters</h1>
-	<main>
-		
-	  <p>Import a CSV file or paste CSV content below. The converter uses  columns : </p>
-	    <code>Name ; Start Timecode ; Frame Rate</code>
-	
-	  <div class="file-picker">
-	    <label for="csvFile">Import CSV file:
-	    <input id="csvFile" type="file" accept=".csv,text/csv">
-		</label>
-	  </div>
-	
-	  <label for="input">Or paste CSV content:</label>
-	  <textarea id="input" placeholder="Paste your CSV content here"></textarea>
-	
-	  <button id="convert">Convert to YouTube chapters</button>
-	  <button id="copy" type="button">Copy output</button>
-	  <span id="status" role="status"></span>
+  <p>Import a CSV file or paste CSV content below. The converter uses  columns : </p>
+    <code>Name ; Start Timecode ; Frame Rate</code>
 
-	</main>
-	<aside>
-		
-	  <label for="output">YouTube chapters:</label>
-	  <textarea id="output" placeholder="Converted chapters will appear here"></textarea>
-		
-	</aside>
+  <div class="file-picker">
+    <label for="csvFile">Import CSV file:
+    <input id="csvFile" type="file" accept=".csv,text/csv">
+	</label>
+  </div>
+
+  <label for="input">Or paste CSV content:</label>
+  <textarea id="input" placeholder="Paste your CSV content here"></textarea>
+
+  <button id="convert" class="btn">Convert to YouTube chapters</button>
+  <button id="copy" type="button" class="btn">Copy output</button>
+  <span id="status" role="status"></span>
+
+  <label for="output">YouTube chapters:</label>
+  <textarea id="output" placeholder="Converted chapters will appear here"></textarea>
   <footer class="footer">
     <a href="https://github.com/thomaslinux/">@thomaslinux9</a>
-	with help from GPT-6 Luna for the logic and Gemma 4 31B
+	with help from GPT-6 Luna for the logic and Gemma 4 31B for the styling
 	<br>Source : <a href="https://github.com/thomaslinux/filmcraft-csv-to-youtube-chapters">https://github.com/thomaslinux/filmcraft-csv-to-youtube-chapters</a>
 	<br>FilmCraft : <a href="https://getartcraft.com/apps/filmcraft">https://getartcraft.com/apps/filmcraft</a>
   </footer>
+	<a href="index.html" download class="btn" style="text-decoration:none">
+		Save page for offline use
+	</a>
   <script>
     const input = document.getElementById("input");
     const output = document.getElementById("output");
@@ -251,7 +247,7 @@ textarea {
   resize: vertical;
 }
 
-button {
+.btn {
   margin-top: 16px;
   margin-right: 8px;
   padding: 10px 16px;
@@ -263,12 +259,12 @@ button {
   border: 1px solid transparent;
 }
 
-#convert {
+.btn {
   background-color: #2563eb;
   color: white;
 }
 
-#convert:hover {
+.btn:hover {
   background-color: #1d4ed8;
 }
 
