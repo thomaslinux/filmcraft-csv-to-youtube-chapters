@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Convert FilmCraft csv markers to YouTube Chapters">
+  <title>FilmCraft csv markers to YouTube Chapters</title>
+</head>
+<body>
+  <h1>FilmCraft csv markers to YouTube Chapters</h1>
+  <p>Import a CSV file or paste CSV content below. The converter uses  columns : </p>
+    <code>Name ; Start Timecode ; Frame Rate</code>
+
+  <div class="file-picker">
+    <label for="csvFile">Import CSV file:
+    <input id="csvFile" type="file" accept=".csv,text/csv">
+	</label>
+  </div>
+
+  <label for="input">Or paste CSV content:</label>
+  <textarea id="input" placeholder="Paste your CSV content here"></textarea>
+
+  <button id="convert">Convert to YouTube chapters</button>
+  <button id="copy" type="button">Copy output</button>
+  <span id="status" role="status"></span>
+
+  <label for="output">YouTube chapters:</label>
+  <textarea id="output" placeholder="Converted chapters will appear here"></textarea>
+  <footer class="footer">
+    <a href="https://github.com/thomaslinux/">@thomaslinux9</a>
+	with help from GPT-6 Luna for the logic and Gemma 4 31B
+	<br>Source : <a href="https://github.com/thomaslinux/filmcraft-csv-to-youtube-chapters">https://github.com/thomaslinux/filmcraft-csv-to-youtube-chapters</a>
+	<br>FilmCraft : <a href="https://getartcraft.com/apps/filmcraft">https://getartcraft.com/apps/filmcraft</a>
+  </footer>
+  <script>
+    const input = document.getElementById("input");
+    const output = document.getElementById("output");
+    const status = document.getElementById("status");
+
+    document.getElementById("csvFile").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        input.value = await file.text();
+        status.textContent = `Loaded ${file.name}`;
+      } catch {
+        status.textContent = "Could not read that file.";
+      }
+    });
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        if (quoted) {
+          if (char === '"' && text[i + 1] === '"') {
+            field += '"';
+            i++;
+          } else if (char === '"') {
+            quoted = false;
+          } else {
+            field += char;
+          }
+        } else if (char === '"') {
+          quoted = true;
+        } else if (char === ",") {
+          row.push(field);
+          field = "";
+        } else if (char === "\n") {
+          row.push(field);
+          rows.push(row);
+          row = [];
+          field = "";
+        } else if (char !== "\r") {
+          field += char;
+        }
+      }
+
+      if (field || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function formatTimestamp(totalSeconds) {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const pad = value => String(value).padStart(2, "0");
+
+      return hours > 0
+        ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+        : `${minutes}:${pad(seconds)}`;
+    }
+
+    function convert() {
+      const rows = parseCSV(input.value.trim());
+      if (rows.length < 2) {
+        throw new Error("Paste CSV content or import a CSV file first.");
+      }
+
+      const headers = rows[0].map(header => header.trim());
+      const nameIndex = headers.indexOf("Name");
+      const timeIndex = headers.indexOf("Start Timecode");
+      const rateIndex = headers.indexOf("Frame Rate");
+
+      if ([nameIndex, timeIndex, rateIndex].some(index => index < 0)) {
+        throw new Error("CSV must include Name, Start Timecode, and Frame Rate columns.");
+      }
+
+      const chapters = rows.slice(1)
+        .filter(row => row[timeIndex] && row[nameIndex])
+        .map(row => {
+          const match = row[timeIndex].trim().match(/^(\d+):(\d{2}):(\d{2}):(\d{2})$/);
+          if (!match) throw new Error(`Invalid timecode: ${row[timeIndex]}`);
+
+          const [hours, minutes, seconds, frames] = match.slice(1).map(Number);
+          const rateParts = row[rateIndex].trim().split("/").map(Number);
+          const fps = rateParts.length === 2
+            ? rateParts[0] / rateParts[1]
+            : Number(rateParts[0]);
+
+          if (!Number.isFinite(fps) || fps <= 0) {
+            throw new Error(`Invalid frame rate: ${row[rateIndex]}`);
+          }
+
+          const totalSeconds = Math.floor(
+            hours * 3600 + minutes * 60 + seconds + frames / fps
+          );
+
+          return {
+            seconds: totalSeconds,
+            line: `${formatTimestamp(totalSeconds)} ${row[nameIndex].trim()}`
+          };
+        })
+        .sort((a, b) => a.seconds - b.seconds);
+
+      output.value = chapters.map(chapter => chapter.line).join("\n");
+      status.textContent = "";
+    }
+
+    document.getElementById("convert").addEventListener("click", () => {
+      try {
+        convert();
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    });
+
+    document.getElementById("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(output.value);
+        status.textContent = "Copied!";
+      } catch {
+        output.select();
+        document.execCommand("copy");
+        status.textContent = "Copied!";
+      }
+    });
+  </script>
+  <style>
+    body {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      font: 16px/1.5 system-ui, sans-serif;
+    }
+    textarea {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 220px;
+      margin: .5rem 0 1rem;
+      padding: .75rem;
+      font: 14px/1.4 monospace;
+    }
+    button { padding: .6rem 1rem; cursor: pointer; }
+    #status { margin-left: .75rem; }
+
+  </style>
+  <style class="modern">
+  body {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+  background-color: #f3f4f6;
+    font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+code {
+  display: block;
+  background: #e5e7eb;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+  color: #374151;
+}
+
+.file-picker {
+  margin-bottom: 12px;
+}
+
+.file-picker label {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input[type="file"] {
+  font-size: 0.875rem;
+  padding: 8px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+button {
+  margin-top: 16px;
+  margin-right: 8px;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+#convert {
+  background-color: #2563eb;
+  color: white;
+}
+
+#convert:hover {
+  background-color: #1d4ed8;
+}
+
+#copy {
+  background-color: white;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+#copy:hover {
+  background-color: #f9fafb;
+}
+
+#status {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #059669;
+}
+
+.footer {
+  <!-- text-align: center; -->
+  margin-top: 40px;
+  padding: 20px 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.footer a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+</style>
+  <style class="css-file-picker">
+.file-picker input[type="file"]:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.file-picker input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.file-picker input[type="file"]::file-selector-button:hover {
+  background-color: #2563eb;
+}
+</style>
+</body>
+</html>
