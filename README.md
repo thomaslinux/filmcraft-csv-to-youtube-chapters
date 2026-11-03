@@ -17,7 +17,8 @@ Me for some small tweaks to the final code
 
 # Prompts
 To GPT-6 Luna
-```a html page that convert this into youtube timecodes for chapters :
+```
+a html page that convert this into youtube timecodes for chapters :
 
 Sequence,Marker ID,Name,Comment,Kind,Color,Start Timecode,End Timecode,Duration Frames,Start Ticks,Duration Ticks,Frame Rate,Author,URL
 "Sequence 01","414","intro","","Chapter","Ambience","00:00:00:00","00:00:00:00","0","0","0","60/1","",""
