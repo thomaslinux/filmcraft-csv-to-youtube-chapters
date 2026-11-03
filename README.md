@@ -26,7 +26,7 @@ Sequence,Marker ID,Name,Comment,Kind,Color,Start Timecode,End Timecode,Duration 
 [...]
 ```
 
-To Gemma 4 31B ended inside <style class="css-file-picker"></style>
+To Gemma 4 31B ended inside ``<style class="css-file-picker"></style>``
 ```
   <div class="file-picker">
     <label for="csvFile">Import CSV file:
@@ -37,7 +37,7 @@ To Gemma 4 31B ended inside <style class="css-file-picker"></style>
 simple css code for modern styling
 ```
 
-To Gemma 4 31B ended inside <style class="modern"></style>
+To Gemma 4 31B ended inside ``<style class="modern"></style>``
 ```
 <h1>FilmCraft csv markers to YouTube Chapter</h1>
   <p>Import a CSV file or paste CSV content below. The converter uses the following columns</p>
