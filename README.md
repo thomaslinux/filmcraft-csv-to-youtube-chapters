@@ -3,12 +3,16 @@ Convert FilmCraft csv markers to YouTube Chapters
 
 # Why ?
 Because I wanted to convert the exported csv markers from FilmCraft into YouTube Chapters.
+
 Because I wanted to show what you can do with small prompts to free llms on duck.ai
 
 # Credits
 FilmCraft team (tested v0.16, very usable)
+
 GPT-6 Luna for the logic
+
 Gemma 4 31B for the styling
+
 Me for some small tweaks to the final code
 
 # Prompts
