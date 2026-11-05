@@ -1,5 +1,6 @@
-# filmcraft-csv-to-youtube-chapters
-Convert FilmCraft csv markers to YouTube Chapters
+# Convert csv markers to youtube chapters
+Single html page to convert FilmCraft csv markers to YouTube Chapters.
+Works offline, hosted on github because it's free.
 
 # Why ?
 Because I wanted to convert the exported csv markers from FilmCraft into YouTube Chapters.
